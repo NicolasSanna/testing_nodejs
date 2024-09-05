@@ -1,0 +1,45 @@
+# Nom du workflow CI (Intégration Continue)
+name: Node.js CI
+
+# Déclenchement du workflow
+on:
+  # Le workflow s'exécute lors d'un push sur la branche "main"
+  push:
+    branches: [ "main" ]
+  
+  # Le workflow s'exécute lors d'une pull request vers la branche "main"
+  pull_request:
+    branches: [ "main" ]
+
+# Définition des jobs du workflow
+jobs:
+  
+  # Premier job : test de l'application
+  test:
+    # Le job s'exécute sur la dernière version d'Ubuntu
+    runs-on: ubuntu-latest
+    
+    # Définition des étapes du job
+    steps:
+      # Étape 1 : checkout du code source depuis le repo GitHub
+      - uses: actions/checkout@v3
+
+      # Étape 2 : installation des dépendances et exécution des tests
+      - name: test the project
+        # Exécution d'une commande shell pour installer les dépendances (npm install) et lancer les tests (npm run test)
+        run: npm install && npm run test
+
+  # Deuxième job : construction d'une image Docker
+  build:
+    # Le job s'exécute également sur la dernière version d'Ubuntu
+    runs-on: ubuntu-latest
+    
+    # Définition des étapes du job
+    steps:
+      # Étape 1 : checkout du code source depuis le repo GitHub
+      - uses: actions/checkout@v4
+
+      # Étape 2 : construction d'une image Docker à partir du Dockerfile
+      - name: Build the Docker image
+        # Commande pour construire l'image Docker avec un tag qui inclut un timestamp pour éviter les conflits de noms d'images
+        run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
